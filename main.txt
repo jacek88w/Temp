@@ -1,0 +1,93 @@
+(function() {
+    var frame = document.createElement('div');
+    frame.style.position = 'fixed';
+    frame.style.left = '50%';
+    frame.style.top = '50%';
+    frame.style.transform = 'translate(-50%, -50%)';
+    frame.style.padding = '20px';
+    frame.style.backgroundColor = '#eee';
+    frame.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    frame.style.border = '2px solid #000';
+    frame.style.zIndex = 1000;
+    frame.style.cursor = 'move';
+    frame.style.userSelect = 'none';
+
+    var input1 = document.createElement('input');
+    input1.type = 'text';
+    input1.placeholder = 'Roles';
+    input1.style.display = 'block';
+    input1.style.marginBottom = '10px';
+    var input2 = document.createElement('input');
+    input2.type = 'text';
+    input2.placeholder = 'System with its code';
+    input2.style.display = 'block';
+    input2.style.marginBottom = '10px';
+
+    // Create submit button
+    var submitButton = document.createElement('button');
+    submitButton.textContent = 'Submit';
+    submitButton.style.display = 'block';
+    submitButton.style.marginTop = '10px';
+
+    // Append elements to frame
+    frame.appendChild(input1);
+    frame.appendChild(input2);
+    frame.appendChild(submitButton);
+    document.body.appendChild(frame);
+
+    // Add event listener to submit button
+    submitButton.addEventListener('click', function() {
+        var rolesValue = input1.value;
+        var systemCodeValue = input2.value;
+
+        prepareRoles(rolesValue, systemCodeValue)
+
+
+        // Remove the frame
+        document.body.removeChild(frame);
+    });
+
+    function prepareRoles(rolesValue, systemCodeValue) {
+        const regex = /\/BMW\/[^\s]*/g;
+
+        const preapredRoleWithoutSystemCode = rolesValue.match(regex);
+
+        if (!preapredRoleWithoutSystemCode) {
+            return ["Process manually"];
+        }
+
+        const preparedRoles = preapredRoleWithoutSystemCode.map(role => role.replace(/\[\*\]/g, systemCodeValue));
+
+        printRolesToScreen(preparedRoles)
+    }
+
+    function printRolesToScreen(preparedRoles) {
+        window.alert(preparedRoles.join('\n'))
+    }
+
+    // Make the modal draggable
+    var isDragging = false;
+    var offsetX, offsetY;
+
+    frame.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        offsetX = e.clientX - frame.getBoundingClientRect().left;
+        offsetY = e.clientY - frame.getBoundingClientRect().top;
+        document.addEventListener('mousemove', moveFrame);
+        document.addEventListener('mouseup', stopDragging);
+    });
+
+    function moveFrame(e) {
+        if (isDragging) {
+            frame.style.left = (e.clientX - offsetX) + 'px';
+            frame.style.top = (e.clientY - offsetY) + 'px';
+            frame.style.transform = 'none';
+        }
+    }
+
+    function stopDragging() {
+        isDragging = false;
+        document.removeEventListener('mousemove', moveFrame);
+        document.removeEventListener('mouseup', stopDragging);
+    }
+})();
